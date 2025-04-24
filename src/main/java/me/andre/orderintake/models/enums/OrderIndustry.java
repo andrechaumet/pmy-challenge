@@ -1,0 +1,14 @@
+package me.andre.orderintake.models.enums;
+
+public enum OrderIndustry {
+  ENERGY,
+  HOLDING,
+  INDUSTRY,
+  OIL_AND_GAS,
+  REAL_ESTATE,
+  AGRIBUSINESS,
+  CONSTRUCTION,
+  FINANCIAL_MARKETS,
+  TELECOMMUNICATIONS,
+  FINANCIAL_SERVICES,
+}
