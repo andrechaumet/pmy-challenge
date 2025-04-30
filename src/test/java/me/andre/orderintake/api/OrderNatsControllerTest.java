@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -52,10 +53,10 @@ public class OrderNatsControllerTest {
   private OrderMatchService orderMatchService;
 
   @Autowired
-  private HashMap<OrderSymbol, HashMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>>> pendingMemory;
+  private EnumMap<OrderSymbol, EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>>> pendingMemory;
 
   @Autowired
-  private HashMap<OrderSymbol, HashSet<UUID>> matchedMemory;
+  private EnumMap<OrderSymbol, HashSet<UUID>> matchedMemory;
 
   @Test
   @SneakyThrows
