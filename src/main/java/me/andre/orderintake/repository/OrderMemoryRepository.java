@@ -6,7 +6,7 @@ import static me.andre.orderintake.models.enums.OrderType.SELL;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -28,8 +28,8 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrderRepository {
 
-  private final HashMap<OrderSymbol, HashMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>>> pendingMemory;
-  private final HashMap<OrderSymbol, HashSet<UUID>> matchedMemory;
+  private final EnumMap<OrderSymbol, EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>>> pendingMemory;
+  private final EnumMap<OrderSymbol, HashSet<UUID>> matchedMemory;
 
   @Override
   public boolean exists(OrderSymbol symbol, UUID id) {
@@ -39,10 +39,10 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   }
 
   @Override
-  public void increment(OrderSymbol symbol, UUID id, UUID id2) {
+  public void increment(OrderSymbol symbol, UUID id1, UUID id2) {
     Optional.of(matchedMemory.get(symbol))
         .ifPresent(ordersBySymbol -> {
-          ordersBySymbol.add(id);
+          ordersBySymbol.add(id1);
           ordersBySymbol.add(id2);
         });
   }
@@ -55,22 +55,26 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   }
 
   @Override
-  public Optional<UUID> matchAvailable(Order order) {
-    return Optional.of(pendingMemory.get(order.symbol()))
-        .map(orderTypes -> orderTypes.get(order.opposite()))
-        .map(orderTypePrices -> orderTypePrices.get(order.price()))
+  public Optional<UUID> removeIfPresent(OrderSymbol symbol, OrderType type, BigDecimal price) {
+    return findBySymbolAndType(symbol, type)
+        .map(orderTypePrices -> orderTypePrices.get(price))
         .map(LinkedHashSet::removeFirst);
   }
 
-  // TODO: unify both methods
   @Override
   public void save(Order order) {
-    Optional.of(pendingMemory.get(order.symbol()))
-        .map(orderTypes -> orderTypes.get(order.type()))
-        .map(orderTypePrices -> orderTypePrices.computeIfAbsent(order.price(),
-            price -> new LinkedHashSet<>()))
+    findBySymbolAndType(order.symbol(), order.type())
+        .map(
+            orderTypePrices -> orderTypePrices.computeIfAbsent(order.price(),
+                price -> new LinkedHashSet<>()))
         .map(byId -> byId.add(order.id()))
         .orElseThrow(() -> FailedToStoreOrderException.instance);
+  }
+
+  private Optional<TreeMap<BigDecimal, LinkedHashSet<UUID>>> findBySymbolAndType(OrderSymbol symbol,
+      OrderType type) {
+    return Optional.of(pendingMemory.get(symbol))
+        .map(orderTypes -> orderTypes.get(type));
   }
 
   @Override
@@ -81,7 +85,7 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   }
 
   private Pair<BigDecimal, BigDecimal> calculatePriceRange(
-      HashMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>> orderTypes) {
+      EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>> orderTypes) {
     var buyOrders = orderTypes.get(BUY);
     var sellOrders = orderTypes.get(SELL);
     BigDecimal lowest = minFirstKeys(buyOrders, sellOrders);

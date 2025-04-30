@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import me.andre.orderintake.models.domains.Order;
 import me.andre.orderintake.models.enums.OrderSymbol;
+import me.andre.orderintake.models.enums.OrderType;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -13,13 +14,13 @@ import org.apache.commons.lang3.tuple.Pair;
 public interface PendingOrderRepository {
 
   //todo: true
+
   /**
    * Removes an opposite order that matches the given order and returns true if a match was found.
    *
-   * @param order the order to be checked for an opposite match
    * @return id of the matched order in case of a match
    */
-  Optional<UUID> matchAvailable(Order order);
+  Optional<UUID> removeIfPresent(OrderSymbol symbol, OrderType type, BigDecimal price);
 
   /**
    * Saves the given order in the repository.

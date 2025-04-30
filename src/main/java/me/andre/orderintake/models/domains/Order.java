@@ -32,7 +32,7 @@ public record Order(
   /**
    * @return the opposite {@link OrderType}
    */
-  public OrderType opposite() {
+  public OrderType oppositeType() {
     return this.type() == BUY ? SELL : BUY;
   }
 

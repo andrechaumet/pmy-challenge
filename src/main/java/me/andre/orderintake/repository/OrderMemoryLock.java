@@ -17,12 +17,11 @@ import org.springframework.stereotype.Repository;
 @AllArgsConstructor
 public class OrderMemoryLock implements LockRepository<Order> {
 
-  // TODO: WeakHashMap
-  private final ConcurrentHashMap<String, ReentrantLock> memoryLocks;
+  private final ConcurrentHashMap<String, ReentrantLock> locksMemory;
 
   @Override
   public void doLock(Lockable lockable) {
-    ReentrantLock lock = memoryLocks.computeIfAbsent(lockable.lockKey(), key -> new ReentrantLock());
+    ReentrantLock lock = locksMemory.computeIfAbsent(lockable.lockKey(), key -> new ReentrantLock());
     try {
       if (!lock.tryLock(10, MILLISECONDS)) {
         throw LockTimeoutException.instance;
@@ -35,6 +34,6 @@ public class OrderMemoryLock implements LockRepository<Order> {
 
   @Override
   public void unlock(Lockable lockable) {
-    Optional.ofNullable(memoryLocks.get(lockable.lockKey())).ifPresent(ReentrantLock::unlock);
+    Optional.ofNullable(locksMemory.get(lockable.lockKey())).ifPresent(ReentrantLock::unlock);
   }
 }

@@ -30,8 +30,11 @@ public class OrderService implements OrderMatchService, OrderQueryService {
   }
 
   public void tryMatch(Order order) {
-    pendingOrdersRepository.matchAvailable(order)
-        .ifPresentOrElse(orderFound -> matched(order, orderFound), () -> notMatched(order));
+    pendingOrdersRepository.removeIfPresent(order.symbol(), order.oppositeType(), order.price())
+        .ifPresentOrElse(orderFound ->
+                matched(order, orderFound),
+            () -> notMatched(order)
+        );
   }
 
   private void matched(Order order1, UUID order2) {
