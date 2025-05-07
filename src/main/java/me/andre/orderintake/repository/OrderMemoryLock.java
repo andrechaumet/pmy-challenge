@@ -21,7 +21,8 @@ public class OrderMemoryLock implements LockRepository<Order> {
 
   @Override
   public void doLock(Lockable lockable) {
-    ReentrantLock lock = locksMemory.computeIfAbsent(lockable.lockKey(), key -> new ReentrantLock());
+    ReentrantLock lock = locksMemory.computeIfAbsent(lockable.lockKey(),
+        key -> new ReentrantLock());
     try {
       if (!lock.tryLock(10, MILLISECONDS)) {
         throw LockTimeoutException.instance;
@@ -34,6 +35,12 @@ public class OrderMemoryLock implements LockRepository<Order> {
 
   @Override
   public void unlock(Lockable lockable) {
-    Optional.ofNullable(locksMemory.get(lockable.lockKey())).ifPresent(ReentrantLock::unlock);
+    Optional.ofNullable(locksMemory.get(lockable.lockKey()))
+        .ifPresent(lock -> {
+          lock.unlock();
+          if (!lock.isLocked() && !lock.hasQueuedThreads()) {
+            locksMemory.remove(lockable.lockKey());
+          }
+        });
   }
 }
