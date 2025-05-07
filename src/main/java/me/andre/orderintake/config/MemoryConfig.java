@@ -40,8 +40,7 @@ public class MemoryConfig {
   }
 
   private EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>> createOrderByType() {
-    EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>> ordersByType = new EnumMap<>(
-        OrderType.class);
+    EnumMap<OrderType, TreeMap<BigDecimal, LinkedHashSet<UUID>>> ordersByType = new EnumMap<>(OrderType.class);
     for (OrderType type : OrderType.values()) {
       ordersByType.put(type, new TreeMap<>());
     }
