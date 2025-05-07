@@ -29,7 +29,7 @@ public class OrderService implements OrderMatchService, OrderQueryService {
     }
   }
 
-  public void tryMatch(Order order) {
+  private void tryMatch(Order order) {
     pendingOrdersRepository.removeIfPresent(order.symbol(), order.oppositeType(), order.price())
         .ifPresentOrElse(orderFound ->
                 matched(order, orderFound),

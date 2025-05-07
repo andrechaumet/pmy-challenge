@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,22 +95,25 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   }
 
   private BigDecimal minFirstKeys(TreeMap<BigDecimal, ?> buy, TreeMap<BigDecimal, ?> sell) {
-    return Stream.of(firstKeyOrZero(buy), firstKeyOrZero(sell))
+    return Stream.of(
+            keyOrZero(buy, TreeMap::firstKey),
+            keyOrZero(sell, TreeMap::firstKey)
+        )
         .min(Comparator.naturalOrder())
         .orElse(ZERO);
   }
 
   private BigDecimal maxLastKeys(TreeMap<BigDecimal, ?> buy, TreeMap<BigDecimal, ?> sell) {
-    return Stream.of(lastKeyOrZero(buy), lastKeyOrZero(sell))
+    return Stream.of(
+            keyOrZero(buy, TreeMap::lastKey),
+            keyOrZero(sell, TreeMap::lastKey)
+        )
         .max(Comparator.naturalOrder())
         .orElse(ZERO);
   }
 
-  private BigDecimal firstKeyOrZero(TreeMap<BigDecimal, ?> orders) {
-    return orders.isEmpty() ? ZERO : orders.firstKey();
-  }
-
-  private BigDecimal lastKeyOrZero(TreeMap<BigDecimal, ?> orders) {
-    return orders.isEmpty() ? ZERO : orders.lastKey();
+  private BigDecimal keyOrZero(TreeMap<BigDecimal, ?> orders,
+      Function<TreeMap<BigDecimal, ?>, BigDecimal> keyExtractor) {
+    return orders.isEmpty() ? ZERO : keyExtractor.apply(orders);
   }
 }
