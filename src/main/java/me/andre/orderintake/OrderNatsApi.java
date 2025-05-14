@@ -1,4 +1,4 @@
-package me.andre.orderintake.api;
+package me.andre.orderintake;
 
 import me.andre.orderintake.models.dtos.CreateOrderRequest;
 

@@ -1,4 +1,4 @@
-package me.andre.orderintake.api;
+package me.andre.orderintake.controller;
 
 import static java.math.BigDecimal.valueOf;
 import static me.andre.orderintake.models.enums.OrderSymbol.CRES;
@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import lombok.SneakyThrows;
+import me.andre.orderintake.OrderNatsApi;
 import me.andre.orderintake.models.dtos.CreateOrderRequest;
 import me.andre.orderintake.models.enums.OrderSymbol;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class OrderRestControllerTest {
+class OrderRestControllerTest {
 
   @Autowired
   private MockMvc mockMvc;

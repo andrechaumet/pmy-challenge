@@ -1,8 +1,9 @@
-package me.andre.orderintake.api;
+package me.andre.orderintake.controller;
 
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.andre.orderintake.OrderRestApi;
 import me.andre.orderintake.business.OrderQueryService;
 import me.andre.orderintake.exception.SymbolNotFoundException;
 import me.andre.orderintake.models.dtos.ExecutedCountResponse;

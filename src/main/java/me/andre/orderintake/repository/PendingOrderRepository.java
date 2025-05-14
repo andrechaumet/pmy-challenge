@@ -13,8 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public interface PendingOrderRepository {
 
-  //todo: true
-
   /**
    * Removes an opposite order that matches the given order and returns true if a match was found.
    *

@@ -1,16 +1,15 @@
-package me.andre.orderintake.api;
+package me.andre.orderintake.controller;
 
 import static java.math.BigDecimal.valueOf;
 import static me.andre.orderintake.models.enums.OrderSymbol.BMA;
 import static me.andre.orderintake.models.enums.OrderSymbol.CEPU;
-import static me.andre.orderintake.models.enums.OrderSymbol.COME;
 import static me.andre.orderintake.models.enums.OrderSymbol.GGAL;
 import static me.andre.orderintake.models.enums.OrderSymbol.IRSA;
 import static me.andre.orderintake.models.enums.OrderSymbol.LOMA;
 import static me.andre.orderintake.models.enums.OrderSymbol.MIRG;
 import static me.andre.orderintake.models.enums.OrderSymbol.TECO2;
 import static me.andre.orderintake.models.enums.OrderSymbol.TRAN;
-import static me.andre.orderintake.models.enums.OrderSymbol.YPFD;
+import static me.andre.orderintake.models.enums.OrderSymbol.TXAR;
 import static me.andre.orderintake.models.enums.OrderType.BUY;
 import static me.andre.orderintake.models.enums.OrderType.SELL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.TreeMap;
@@ -29,6 +27,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import me.andre.orderintake.OrderApp;
+import me.andre.orderintake.OrderNatsApi;
 import me.andre.orderintake.business.OrderMatchService;
 import me.andre.orderintake.business.OrderQueryService;
 import me.andre.orderintake.models.domains.Order;
@@ -39,9 +38,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = OrderApp.class)
 @RequiredArgsConstructor
-public class OrderNatsControllerTest {
+@SpringBootTest(classes = OrderApp.class)
+class OrderNatsControllerTest {
 
   @Autowired
   private OrderNatsApi orderNatsApi;
@@ -61,18 +60,19 @@ public class OrderNatsControllerTest {
   @Test
   @SneakyThrows
   void testSuccessfulSameSymbolMatch() {
+    OrderSymbol symbol = TXAR;
     // GIVEN: All matching orders
-    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), COME, BUY));
-    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), COME, BUY));
-    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), COME, SELL));
-    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), COME, SELL));
+    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), symbol, BUY));
+    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), symbol, BUY));
+    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), symbol, SELL));
+    orderNatsApi.createOrder(new CreateOrderRequest(valueOf(100), symbol, SELL));
     // WHEN: Requesting count by symbol
     // THEN: All should have matched and QueryService should have the correct executed count
-    assertEquals(2, orderQueryService.findExecutedCountBySymbol(COME));
+    assertEquals(2, orderQueryService.findExecutedCountBySymbol(symbol));
     // AND: No pending orders should be in memory
-    assertTrue(pendingMemory.get(YPFD).get(BUY).isEmpty(),
+    assertTrue(pendingMemory.get(symbol).get(BUY).get(valueOf(100)).isEmpty(), // created but left empty
         "There should be no remaining orders");
-    assertTrue(pendingMemory.get(YPFD).get(SELL).isEmpty(),
+    assertTrue(pendingMemory.get(symbol).get(SELL).isEmpty(), // never created as it matched on arrival
         "There should be no remaining orders");
   }
 

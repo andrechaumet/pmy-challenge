@@ -1,9 +1,10 @@
-package me.andre.orderintake.api;
+package me.andre.orderintake.controller;
 
 import static java.util.UUID.randomUUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.andre.orderintake.OrderNatsApi;
 import me.andre.orderintake.business.OrderMatchService;
 import me.andre.orderintake.models.domains.Order;
 import me.andre.orderintake.models.dtos.CreateOrderRequest;

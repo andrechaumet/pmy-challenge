@@ -1,6 +1,7 @@
 package me.andre.orderintake.config;
 
-import java.util.HashMap;
+import static java.util.HashMap.newHashMap;
+
 import java.util.Map;
 import me.andre.orderintake.exception.FailedToStoreOrderException;
 import me.andre.orderintake.exception.LockTimeoutException;
@@ -23,7 +24,7 @@ public class RetryConfig {
     fixedBackOffPolicy.setBackOffPeriod(2000L);
     retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
 
-    Map<Class<? extends Throwable>, Boolean> exceptions = new HashMap<>(1);
+    Map<Class<? extends Throwable>, Boolean> exceptions = newHashMap(2);
     exceptions.put(FailedToStoreOrderException.class, true);
     exceptions.put(LockTimeoutException.class, true);
     SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(2, exceptions);
