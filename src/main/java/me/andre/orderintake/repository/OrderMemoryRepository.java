@@ -65,9 +65,8 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   @Override
   public void save(Order order) {
     findBySymbolAndType(order.symbol(), order.type())
-        .map(
-            orderTypePrices -> orderTypePrices.computeIfAbsent(order.price(),
-                price -> new LinkedHashSet<>()))
+        .map(orderTypePrices ->
+                orderTypePrices.computeIfAbsent(order.price(), price -> new LinkedHashSet<>()))
         .map(byId -> byId.add(order.id()))
         .orElseThrow(() -> FailedToStoreOrderException.instance);
   }
@@ -104,10 +103,7 @@ public class OrderMemoryRepository implements MatchedOrderRepository, PendingOrd
   }
 
   private BigDecimal maxLastKeys(TreeMap<BigDecimal, ?> buy, TreeMap<BigDecimal, ?> sell) {
-    return Stream.of(
-            keyOrZero(buy, TreeMap::lastKey),
-            keyOrZero(sell, TreeMap::lastKey)
-        )
+    return Stream.of(keyOrZero(buy, TreeMap::lastKey), keyOrZero(sell, TreeMap::lastKey))
         .max(Comparator.naturalOrder())
         .orElse(ZERO);
   }
